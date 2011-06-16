@@ -50,6 +50,21 @@ public class nPlayerListener extends PlayerListener {
 		}catch (IOException e){
 			e.printStackTrace();
 		}
+		try {
+		    BufferedReader in = new BufferedReader(new FileReader("plugins/NetherBan/whitelist.txt"));
+		    String str;
+		    while ((str = in.readLine()) != null) {
+		    	final Player player = event.getPlayer();
+		    	String name = player.getName();
+		    	if(str.equals(name)){
+		    		plugin.playerSafe.put(player, false);
+		    	}
+		    }
+		    in.close();
+		}catch (IOException e){
+			e.printStackTrace();
+			
+		}
 	}
     public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event){
     	if(NetherBan.emptybucket == true){
