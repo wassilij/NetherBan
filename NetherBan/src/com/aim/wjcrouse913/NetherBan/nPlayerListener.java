@@ -12,7 +12,6 @@ import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
@@ -24,14 +23,6 @@ public class nPlayerListener extends PlayerListener {
 	public nPlayerListener(NetherBan instance) {
 		plugin = instance;
 
-	}
-	public void onPlayerMove(PlayerMoveEvent event){
-		Player player = event.getPlayer();
-		if(!player.getWorld().equals(plugin.getServer().getWorld(NetherBan.nethername))){
-			if(plugin.playerBanish.containsKey(player)){
-				player.teleport(plugin.getServer().getWorld(NetherBan.nethername).getSpawnLocation());
-			}
-		}
 	}
 	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event){
 		if(NetherBan.commands == true){
