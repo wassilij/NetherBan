@@ -35,7 +35,7 @@ import org.bukkit.plugin.Plugin;
 
 public class NetherBan extends JavaPlugin {
 	public static String prefix = "[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "]";
-	public static String version = "v0.2";
+	public static String version = "v0.3";
 	public static String whitelist;
 	public static String nethername;
 	public static String normalname;
