@@ -14,7 +14,7 @@ public class nBlockListener extends BlockListener {
 
 	public nBlockListener(NetherBan instance) {
 		plugin = instance;
-		
+
 	}
 	public void onBlockPlace(BlockPlaceEvent event){
 		Block block = event.getBlock();
@@ -23,7 +23,7 @@ public class nBlockListener extends BlockListener {
 			if(plugin.playerBanish.containsKey(player)){
 				player.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "]" + ChatColor.GRAY + " You cannot place blocks while you are banished!");
 				event.setCancelled(true);
-				
+
 			}
 		}
 		if(NetherBan.bedrock == true){
@@ -33,7 +33,7 @@ public class nBlockListener extends BlockListener {
 				player.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "]" + ChatColor.GRAY + " You have been banned from the nether for using an illegal material!");
 				plugin.playerBanish.put(player, false);
 				event.setCancelled(true);
-				
+
 			}
 		}
 		if(NetherBan.lava == true){
@@ -43,7 +43,7 @@ public class nBlockListener extends BlockListener {
 				player.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "]" + ChatColor.GRAY + " You have been banned from the nether for using an illegal material!");
 				plugin.playerBanish.put(player, false);
 				event.setCancelled(true);
-				
+
 			}
 		}
 		if(NetherBan.tnt == true){
@@ -53,7 +53,7 @@ public class nBlockListener extends BlockListener {
 					player.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "]" + ChatColor.GRAY + " You have been banned from the nether for using an illegal material!");
 					plugin.playerBanish.put(player, false);
 					event.setCancelled(true);
-				
+
 			}
 		}
 		if(NetherBan.fire == true){
@@ -63,7 +63,7 @@ public class nBlockListener extends BlockListener {
 				player.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "]" + ChatColor.GRAY + " You have been banned from the nether for using an illegal material!");
 				plugin.playerBanish.put(player, false);
 				event.setCancelled(true);
-				
+
 			}
 		}
 	}
@@ -73,7 +73,7 @@ public class nBlockListener extends BlockListener {
 			if(plugin.playerBanish.containsKey(player)){
 				player.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "]" + ChatColor.GRAY + " You cannot break blocks while you are banished!");
 				event.setCancelled(true);
-				
+
 			}
 		}
 	}

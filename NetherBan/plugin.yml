@@ -1,6 +1,6 @@
 name: NetherBan
 main: com.aim.wjcrouse913.NetherBan.NetherBan
-version: 0.1.1
+version: 0.2
 description: NetherBan allows you to ban and kick players to the Nether!
 author: Walker Crouse
 database: false
@@ -29,3 +29,11 @@ commands:
       description: Put a player in the whitelist.txt!
       usage: |
              Usage: /nbkick <player>
+   nbversion:
+      description: Shows you what version of NetherBan you are running!
+      usage: |
+             Usage: /nbversion
+   nbhelp:
+      description: Displays a help menu for NetherBan!
+      usage: |
+             Usage: /nbhelp

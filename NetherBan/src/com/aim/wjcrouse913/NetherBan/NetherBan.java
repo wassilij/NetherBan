@@ -34,6 +34,8 @@ import org.bukkit.plugin.Plugin;
  * http://sam.zoy.org/wtfpl/COPYING for more details. */
 
 public class NetherBan extends JavaPlugin {
+	public static String prefix = "[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "]";
+	public static String version = "v0.2";
 	public static String whitelist;
 	public static String nethername;
 	public static String normalname;
@@ -83,7 +85,7 @@ public class NetherBan extends JavaPlugin {
 		lava = Boolean.parseBoolean(prop.getProperty("Blacklist-Lava"));
 		tnt = Boolean.parseBoolean(prop.getProperty("Blacklist-TnT"));
 		fire = Boolean.parseBoolean(prop.getProperty("Blacklist-Fire"));
-		
+
 	}
 	public void onEnable(){
 		setupPermissions();
@@ -93,7 +95,7 @@ public class NetherBan extends JavaPlugin {
 				Whitelist.createNewFile();
 			}catch (IOException ex){
 				ex.printStackTrace();
-				
+
 			}
 		}
 		new File(mainDirectory).mkdir();
@@ -102,7 +104,7 @@ public class NetherBan extends JavaPlugin {
 				BanList.createNewFile();
 			}catch(IOException ex){
 				ex.printStackTrace();
-				
+
 			}
 		}
 		if(!ConfigCreate.exists()){
@@ -130,6 +132,7 @@ public class NetherBan extends JavaPlugin {
 			loadProcedure();
 		}
 		PluginManager pm = this.getServer().getPluginManager();
+		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_PORTAL, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Event.Priority.Normal, this);
@@ -149,6 +152,36 @@ public class NetherBan extends JavaPlugin {
 	}
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
+		if(label.equalsIgnoreCase("nbhelp")){
+			if(sender instanceof Player){
+				sender.sendMessage(ChatColor.GRAY + "---------------" + ChatColor.WHITE + "[ " + ChatColor.DARK_RED + "NetherBan " + ChatColor.GREEN + "Help" + ChatColor.WHITE + " ]" + ChatColor.GRAY + "---------------");
+				sender.sendMessage(ChatColor.GRAY + "-" + ChatColor.RED + "/nbban <player>" + ChatColor.GRAY + " -- " + ChatColor.GREEN + "Ban a player to the Nether" + ChatColor.GRAY + "------");
+				sender.sendMessage(ChatColor.GRAY + "-" + ChatColor.RED + "/nbkick <player>" + ChatColor.GRAY + " - " + ChatColor.GREEN + "Kick a player to the Nether" + ChatColor.GRAY + "-------");
+				sender.sendMessage(ChatColor.GRAY + "-" + ChatColor.RED + "/nbunban <player>" + ChatColor.GRAY + "-" + ChatColor.GREEN + "Unban player from the Nether" + ChatColor.GRAY + "----");
+				sender.sendMessage(ChatColor.GRAY + "-" + ChatColor.RED + "/nbversion" + ChatColor.GRAY + " -- " + ChatColor.GREEN + "Shows the NetherBan Version!" + ChatColor.GRAY + "---------");
+				sender.sendMessage(ChatColor.GRAY + "-" + ChatColor.RED + "/nbhelp" + ChatColor.GRAY + " -- " + ChatColor.GREEN + "Displays this message!" + ChatColor.GRAY + "------------------");
+				sender.sendMessage(ChatColor.GRAY + "------------------------------------------------");
+				return true;
+			}else{
+				sender.sendMessage("---------------[ NetherBan Help ]---------------");
+				sender.sendMessage("-/nbban <player> -- Ban a Player to the Nether -");
+				sender.sendMessage("-/nbkick <player> - Kick a Player to the Nether-");
+				sender.sendMessage("-/nbunban <player>-Unban Player from ze Nether -");
+				sender.sendMessage("-/nbversion -- Shows NetherBan Version!---------");
+				sender.sendMessage("-/nbhelp -- Displays this message!--------------");
+				sender.sendMessage("------------------------------------------------");
+				return true;
+			}
+		}
+		if(label.equalsIgnoreCase("nbversion")){
+			if(sender instanceof Player){
+				sender.sendMessage(prefix + " " + ChatColor.DARK_PURPLE + this.getServer().getIp() + ChatColor.GRAY + " is running NetherBan " + ChatColor.GREEN + version);
+				return true;
+			}else{
+				sender.sendMessage("[NetherBan] " + this.getServer().getIp() + ChatColor.DARK_RED + "NetherBan" + ChatColor.GRAY + " is running NetherBan " + version);
+				return true;
+			}
+		}
 		Plugin permissions = this.getServer().getPluginManager().getPlugin("Permissions");
 		if(!label.equalsIgnoreCase("nbwl") || !label.equalsIgnoreCase("nbwhitelist")){
 			if(permissions != null){
@@ -168,6 +201,27 @@ public class NetherBan extends JavaPlugin {
 					return true;
 				}else{
 					toggleBanish(getServer().getPlayer(args[0]));
+				}
+			}
+		}
+		if(label.equalsIgnoreCase("nbwhitelist") || label.equalsIgnoreCase("nbwl")){
+			if(permissions != null){
+				if(sender instanceof Player){
+					if(!(this.permissionHandler.has((Player)sender, "netherban.whitelist"))){
+						sender.sendMessage(ChatColor.RED + "You don't have permission to do that!");
+						return true;
+					}else{
+						return onWhitelist(sender, args);
+					}
+				}else{
+					return onWhitelist(sender, args);
+				}
+			}else{
+				if(!sender.isOp()){
+					sender.sendMessage(ChatColor.RED + "You don't have permission to do that!");
+					return true;
+				}else{
+					return onWhitelist(sender, args);
 				}
 			}
 		}
@@ -216,54 +270,45 @@ public class NetherBan extends JavaPlugin {
 				return onPlayerKick(sender, args);
 			}
 		}
-		if(label.equalsIgnoreCase("nbwl") || label.equalsIgnoreCase("nbwhitelist")){
-			if(sender instanceof Player){
-				if(!(this.permissionHandler.has((Player)sender, "netherban.whitelist"))){
-					sender.sendMessage(ChatColor.RED + "You don't have permission to do that!");
-					return true;
-				}else{
-					return onWhitelist(sender, args);
-				}
-			}else{
-				return onWhitelist(sender, args);
-			}
-		}
 		return false;
 	}
 	private void toggleBanish(Player player) {
-		if(playerBanish.containsKey(player)){
-	        if(playerBanish.get(player)){
-	            playerBanish.put(player, false);
-	        } else {
-	            playerBanish.put(player, true);
-	            player.teleport(this.getServer().getWorld(normalname).getSpawnLocation());
-	            player.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "]" + ChatColor.GRAY + " You have been freed from the Nether!");
-	        }
-	    } else {
-	    	if(!playerSafe.containsKey(player)){
-	    		playerBanish.put(player, true);
-	    		if(!player.getWorld().equals(this.getServer().getWorld(nethername))){
-	    			player.teleport(this.getServer().getWorld(nethername).getSpawnLocation());
-	    		}
-	    		player.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "]" + ChatColor.GRAY + " You have been banished to the Nether!");
-	    	}
-            
-	    }
+		if(playerSafe.containsKey(player)){
+			if(playerSafe.get(player)){
+				if(playerBanish.containsKey(player)){
+					if(playerBanish.get(player)){
+						playerBanish.put(player, false);
+					} else {
+						playerBanish.put(player, true);
+						player.teleport(this.getServer().getWorld(normalname).getSpawnLocation());
+						player.sendMessage(prefix + ChatColor.GRAY + " You have been freed from the Nether!");
+					}
+				} else {
+					playerBanish.put(player, true);
+					if(!playerSafe.containsKey(player)){
+						if(!player.getWorld().equals(this.getServer().getWorld(nethername))){
+							player.teleport(this.getServer().getWorld(nethername).getSpawnLocation());
+							player.sendMessage(prefix + ChatColor.GRAY + " You have been banished to the Nether!");
+						}
+					}
+				}
+			}
+		}
 	}
-	public boolean onWhitelist(CommandSender sender, String[] args){
+	private boolean onWhitelist(CommandSender sender, String[] args) {
 		if(args.length < 1){
-			sender.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "] " + ChatColor.RED + " Not enough arguments!");
+			sender.sendMessage(prefix + ChatColor.RED + " Not enough arguments!");
 			return false;
 		}
 		if(args.length > 1){
-			sender.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "] " + ChatColor.RED + " Not enough arguments!");
+			sender.sendMessage(prefix + ChatColor.RED + " Too many arguments!");
 			return false;
 		}
 		if(args.length == 1){
 			String p = args[0];
 			Player safe = this.getServer().getPlayer(p);
 			if(safe instanceof Player){
-				try{
+				try {
 					main(null);
 					Writer output = null;
 					String text = safe.getName();
@@ -271,13 +316,28 @@ public class NetherBan extends JavaPlugin {
 					output = new BufferedWriter(new FileWriter(file));
 					output.write(text);
 					output.close();
-					sender.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "] " + ChatColor.GREEN + safe.getDisplayName() + ChatColor.GRAY + " was added to the whitelist!");
-					safe.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "]" + ChatColor.GRAY + " You were added to the whitelist!");
+					System.out.println("[NetherBan] " + safe.getDisplayName() + " was added to the Whitelist!");  
+					safe.sendMessage(prefix + ChatColor.GRAY + " You were added to the whitelist!");
+					sender.sendMessage(prefix + " " + ChatColor.GREEN + safe.getDisplayName() + ChatColor.GRAY + " added to the whitelist!");
 					playerSafe.put(safe, false);
-				}catch (IOException e){
-					e.printStackTrace();
 					return true;
-					
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}else{
+				try {
+					main(null);
+					Writer output = null;
+					String text = p;
+					File file = new File("plugins/NetherBan/whitelist.txt");
+					output = new BufferedWriter(new FileWriter(file));
+					output.write(text);
+					output.close();
+					System.out.println("[NetherBan] " + p + " was added to the Whitelist!");  
+					sender.sendMessage(prefix + " " + ChatColor.GREEN + p + ChatColor.GRAY + " added to the whitelist!");
+					return true;
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 		}
@@ -285,50 +345,64 @@ public class NetherBan extends JavaPlugin {
 	}
 	public boolean onPlayerBan(CommandSender sender, String[] args){
 		if(args.length < 1){
-			sender.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "] " + ChatColor.RED + " Not enough arguments!");
+			sender.sendMessage(prefix + " " + ChatColor.RED + " Not enough arguments!");
 			return false;
 		}
 		if(args.length > 1){
-			sender.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "] " + ChatColor.RED + " Too many arguments!");
+			sender.sendMessage(prefix + " " + ChatColor.RED + " Too many arguments!");
 			return false;
-			
+
 		}
 		if(args.length == 1){
 			String p = args[0];
 			Player banned = this.getServer().getPlayer(p);
-			if(banned instanceof Player){
-				try {
-					main(null);
-					Writer output = null;
-					String text = banned.getName();
-					File file = new File("plugins/NetherBan/banished.txt");
-					output = new BufferedWriter(new FileWriter(file));
-					output.write(text);
-					output.close();
-					System.out.println("[NetherBan] " + banned.getDisplayName() + " was banished to the Nether!");  
-				} catch (IOException e) {
-					e.printStackTrace();
-					
-				}
-				if(!playerSafe.containsKey(banned)){
-					sender.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "] " + ChatColor.GREEN + banned.getDisplayName() + ChatColor.GRAY + " was banished to the Nether!");
-					playerBanish.put(banned, false);
-					return true;
+			if(!playerSafe.containsKey(banned)){
+				if(banned instanceof Player){
+					try {
+						main(null);
+						Writer output = null;
+						String text = banned.getName();
+						File file = new File("plugins/NetherBan/banished.txt");
+						output = new BufferedWriter(new FileWriter(file));
+						output.write(text);
+						output.close();
+						System.out.println("[NetherBan] " + banned.getDisplayName() + " was banished to the Nether!");  
+						sender.sendMessage(prefix + " " + ChatColor.GREEN + banned.getDisplayName() + ChatColor.GRAY + " was banished to the Nether!");
+						playerBanish.put(banned, false);
+						return true;
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}else{
-					sender.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "] " + ChatColor.GREEN + banned.getDisplayName() + ChatColor.GRAY + " cannot be banished to the Nether!");
+					try {
+						main(null);
+						Writer output = null;
+						String text = p;
+						File file = new File("plugins/NetherBan/banished.txt");
+						output = new BufferedWriter(new FileWriter(file));
+						output.write(text);
+						output.close();
+						System.out.println("[NetherBan] " + p + " was banished to the Nether!");  
+						sender.sendMessage(prefix + " " + ChatColor.GREEN + p + ChatColor.GRAY + " was banished to the Nether!");
+						return true;
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
-					
+			}else{
+				sender.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "] " + ChatColor.GREEN + banned.getDisplayName() + ChatColor.GRAY + " cannot be banished to the Nether!");
+				return true;
 			}
 		}
 		return false;
 	}
 	public boolean onPlayerUnbanned(CommandSender sender, String[] args){
 			if(args.length < 1){
-				sender.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "] " + ChatColor.RED + "Not enough arguments!");
+				sender.sendMessage(prefix + " " + ChatColor.RED + "Not enough arguments!");
 				return false;
 			}
 			if(args.length > 1){
-				sender.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "] " + ChatColor.RED + "Too many arguments!");
+				sender.sendMessage(prefix + " " + ChatColor.RED + "Too many arguments!");
 				return false;
 			}
 			if(args.length == 1){
@@ -348,47 +422,43 @@ public class NetherBan extends JavaPlugin {
 								output = new BufferedWriter(new FileWriter(file));
 								output.write(text);
 								output.close();
-								
+								playerBanish.remove(unbanned);
+								sender.sendMessage(prefix + " " + ChatColor.GREEN + unbanned.getDisplayName() + ChatColor.GRAY + " unbanished from the Nether!");
+								return true;
 							}
-							
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
-						
 					}
-					playerBanish.remove(unbanned);
-					sender.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "] " + ChatColor.GREEN + unbanned.getDisplayName() + ChatColor.GRAY + " unbanished from the Nether!");
-					return true;
-					
 				}
 			}
 			return false;
 	}
 	public boolean onPlayerKick(CommandSender sender, String[] args){
 		if(args.length < 1){
-			sender.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "] " + ChatColor.RED + "Not enough arguments!");
+			sender.sendMessage(prefix + " " + ChatColor.RED + "Not enough arguments!");
 			return false;
 		}
 		if(args.length > 1){
-			sender.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "] " + ChatColor.RED + "Too many arguments!");
+			sender.sendMessage(prefix + " " + ChatColor.RED + "Too many arguments!");
 			return false;
 		}
 		if(args.length == 1){
 			String p = args[0];
 			Player kicked = this.getServer().getPlayer(p);
 			if(kicked instanceof Player){
-				sender.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "] " + ChatColor.GREEN + kicked.getDisplayName() + ChatColor.GRAY + " kicked to the Nether!");
+				sender.sendMessage(prefix + " " + ChatColor.GREEN + kicked.getDisplayName() + ChatColor.GRAY + " kicked to the Nether!");
 				kicked.teleport(this.getServer().getWorld(String.valueOf(nethername)).getSpawnLocation());
-	        	kicked.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "] " + ChatColor.GRAY + "You have been banished to the Nether!");
+	        	kicked.sendMessage(prefix + " " + ChatColor.GRAY + "You have been banished to the Nether!");
 	        	playerBanish.remove(kicked);
 	        	return true;
 			}
-			
+
 		}
 		return false;
 	}
 	public static void main(String[] args)throws IOException{
-		
+
 	}
 	private void setupPermissions() {
 	      Plugin permissionsPlugin = this.getServer().getPluginManager().getPlugin("Permissions");
@@ -398,7 +468,7 @@ public class NetherBan extends JavaPlugin {
 	              this.permissionHandler = ((Permissions) permissionsPlugin).getHandler();
 	          } else {
 	              log.info("[NetherBan] Permission system not detected, defaulting to OP");
-	              
+
 	          }
 	      }
 	}

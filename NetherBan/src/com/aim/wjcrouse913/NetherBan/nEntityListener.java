@@ -11,7 +11,7 @@ public class nEntityListener extends EntityListener{
 
 	public nEntityListener(NetherBan instance){
 		plugin = instance;
-		
+
 	}
 	public void onEntityDamage(EntityDamageEvent event){
 		if(NetherBan.pvp == true){
@@ -23,7 +23,7 @@ public class nEntityListener extends EntityListener{
 						if(plugin.playerBanish.containsKey(attacker)){
 							attacker.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "]" + ChatColor.GRAY + " You can't attack people while banished to the Nether!");
 							event.setCancelled(true);
-							
+
 						}
 					}
 				}
