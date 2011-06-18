@@ -1,0 +1,33 @@
+NetherBan v0.2
+
+*Fixed the plugin not liking when you banned people who where in the Nether already.
+*Chat errors
+*Added whitelist
+*Added whitelist command (/nbwl || /nbwhitelist)
+*Added alias for /nbban (/netherban)
+
+NOTE:
+Please delete old config!
+
+--
+
+NetherBan v0.3
+
+*Added version command (/nbversion)
+*Added help menu (/nbhelp)
+*Players can now be banished while offline
+*Players can now be whitelisted while offline
+*Fixed adding yourself whitelist bans you
+
+NOTE: DOESN'T WORK
+
+--
+
+NetherBan v0.3.1
+
+*Removed players can be banished while offline
+*Removed players can be whitelist while offline
+*Removed whitelist command
+
+TODO: 
+Clear and save inventories on ban, restore on unban (thanks @TerrorBite )
