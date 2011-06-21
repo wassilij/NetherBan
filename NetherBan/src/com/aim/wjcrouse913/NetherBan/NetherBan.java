@@ -34,7 +34,6 @@ import org.bukkit.plugin.Plugin;
  * http://sam.zoy.org/wtfpl/COPYING for more details. */
 
 public class NetherBan extends JavaPlugin {
-	//Okay
 	public static String prefix = "[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "]";
 	public static String version = "v0.4";
 	public static String whitelist;
@@ -155,123 +154,127 @@ public class NetherBan extends JavaPlugin {
 	}
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
-		if(label.equalsIgnoreCase("nbhelp")){
-			if(sender instanceof Player){
-				sender.sendMessage(ChatColor.GRAY + "---------------" + ChatColor.WHITE + "[ " + ChatColor.DARK_RED + "NetherBan " + ChatColor.GREEN + "Help" + ChatColor.WHITE + " ]" + ChatColor.GRAY + "---------------");
-				sender.sendMessage(ChatColor.GRAY + "-" + ChatColor.RED + "/nbban <player>" + ChatColor.GRAY + " -- " + ChatColor.GREEN + "Ban a player to the Nether" + ChatColor.GRAY + "------");
-				sender.sendMessage(ChatColor.GRAY + "-" + ChatColor.RED + "/nbkick <player>" + ChatColor.GRAY + " - " + ChatColor.GREEN + "Kick a player to the Nether" + ChatColor.GRAY + "-------");
-				sender.sendMessage(ChatColor.GRAY + "-" + ChatColor.RED + "/nbunban <player>" + ChatColor.GRAY + "-" + ChatColor.GREEN + "Unban player from the Nether" + ChatColor.GRAY + "----");
-				sender.sendMessage(ChatColor.GRAY + "-" + ChatColor.RED + "/nbwl <player>" + ChatColor.GRAY + " -- " + ChatColor.GREEN + "Makes a player unbanishable" + ChatColor.GRAY + "------");
-				sender.sendMessage(ChatColor.GRAY + "-" + ChatColor.RED + "/nbversion" + ChatColor.GRAY + " -- " + ChatColor.GREEN + "Shows the NetherBan Version!" + ChatColor.GRAY + "---------");
-				sender.sendMessage(ChatColor.GRAY + "-" + ChatColor.RED + "/nbhelp" + ChatColor.GRAY + " -- " + ChatColor.GREEN + "Displays this message!" + ChatColor.GRAY + "------------------");
-				sender.sendMessage(ChatColor.GRAY + "------------------------------------------------");
-				return true;
-			}else{
-				sender.sendMessage("---------------[ NetherBan Help ]---------------");
-				sender.sendMessage("-/nbban <player> -- Ban a Player to the Nether--");
-				sender.sendMessage("-/nbkick <player> - Kick a Player to the Nether-");
-				sender.sendMessage("-/nbunban <player>-Unban Player from ze Nether--");
-				sender.sendMessage("-/nbwl <player> -- Make a player unbanishable---");
-				sender.sendMessage("-/nbversion -- Shows NetherBan Version!---------");
-				sender.sendMessage("-/nbhelp -- Displays this message!--------------");
-				sender.sendMessage("------------------------------------------------");
-				return true;
-			}
-		}
-		if(label.equalsIgnoreCase("nbversion")){
-			if(sender instanceof Player){
-				sender.sendMessage(prefix + ChatColor.GRAY + " This server is running NetherBan " + ChatColor.GREEN + version);
-				return true;
-			}else{
-				sender.sendMessage("[NetherBan] " + this.getServer().getIp() + ChatColor.DARK_RED + "NetherBan" + ChatColor.GRAY + " is running NetherBan " + version);
-				return true;
-			}
-		}
-		//Permissions method
-		Plugin permissions = this.getServer().getPluginManager().getPlugin("Permissions");
-		if(label.equalsIgnoreCase("nbban") || label.equalsIgnoreCase("netherban")){
-			if(permissions != null){
+		if(this.getServer().getWorlds().contains(this.getServer().getWorld(nethername)) && this.getServer().getWorlds().contains(this.getServer().getWorld(normalname))){
+			if(label.equalsIgnoreCase("nbhelp")){
 				if(sender instanceof Player){
-					if(!(this.permissionHandler.has((Player) sender, "netherban.nbban"))){
+					sender.sendMessage(ChatColor.GRAY + "---------------" + ChatColor.WHITE + "[ " + ChatColor.DARK_RED + "NetherBan " + ChatColor.GREEN + "Help" + ChatColor.WHITE + " ]" + ChatColor.GRAY + "---------------");
+					sender.sendMessage(ChatColor.GRAY + "-" + ChatColor.RED + "/nbban <player>" + ChatColor.GRAY + " -- " + ChatColor.GREEN + "Ban a player to the Nether" + ChatColor.GRAY + "------");
+					sender.sendMessage(ChatColor.GRAY + "-" + ChatColor.RED + "/nbkick <player>" + ChatColor.GRAY + " - " + ChatColor.GREEN + "Kick a player to the Nether" + ChatColor.GRAY + "-------");
+					sender.sendMessage(ChatColor.GRAY + "-" + ChatColor.RED + "/nbunban <player>" + ChatColor.GRAY + "-" + ChatColor.GREEN + "Unban player from the Nether" + ChatColor.GRAY + "----");
+					sender.sendMessage(ChatColor.GRAY + "-" + ChatColor.RED + "/nbwl <player>" + ChatColor.GRAY + " -- " + ChatColor.GREEN + "Makes a player unbanishable" + ChatColor.GRAY + "------");
+					sender.sendMessage(ChatColor.GRAY + "-" + ChatColor.RED + "/nbversion" + ChatColor.GRAY + " -- " + ChatColor.GREEN + "Shows the NetherBan Version!" + ChatColor.GRAY + "---------");
+					sender.sendMessage(ChatColor.GRAY + "-" + ChatColor.RED + "/nbhelp" + ChatColor.GRAY + " -- " + ChatColor.GREEN + "Displays this message!" + ChatColor.GRAY + "------------------");
+					sender.sendMessage(ChatColor.GRAY + "------------------------------------------------");
+					return true;
+				}else{
+					sender.sendMessage("---------------[ NetherBan Help ]---------------");
+					sender.sendMessage("-/nbban <player> -- Ban a Player to the Nether--");
+					sender.sendMessage("-/nbkick <player> - Kick a Player to the Nether-");
+					sender.sendMessage("-/nbunban <player>-Unban Player from ze Nether--");
+					sender.sendMessage("-/nbwl <player> -- Make a player unbanishable---");
+					sender.sendMessage("-/nbversion -- Shows NetherBan Version!---------");
+					sender.sendMessage("-/nbhelp -- Displays this message!--------------");
+					sender.sendMessage("------------------------------------------------");
+					return true;
+				}
+			}
+			if(label.equalsIgnoreCase("nbversion")){
+				if(sender instanceof Player){
+					sender.sendMessage(prefix + ChatColor.GRAY + " This server is running NetherBan " + ChatColor.GREEN + version);
+					return true;
+				}else{
+					sender.sendMessage("[NetherBan] " + this.getServer().getIp() + ChatColor.DARK_RED + "NetherBan" + ChatColor.GRAY + " is running NetherBan " + version);
+					return true;
+				}
+			}
+			Plugin permissions = this.getServer().getPluginManager().getPlugin("Permissions");
+			if(label.equalsIgnoreCase("nbban") || label.equalsIgnoreCase("netherban")){
+				if(permissions != null){
+					if(sender instanceof Player){
+						if(!(this.permissionHandler.has((Player) sender, "netherban.nbban"))){
+							sender.sendMessage(ChatColor.RED + "You don't have permission to do that!");
+							return true;
+						}else{
+							return onPlayerBan(sender, args);
+						}
+					}else{
+						return onPlayerBan(sender, args);
+					}
+				}else{
+					if(!sender.isOp()){
 						sender.sendMessage(ChatColor.RED + "You don't have permission to do that!");
 						return true;
 					}else{
 						return onPlayerBan(sender, args);
 					}
-				}else{
-					return onPlayerBan(sender, args);
-				}
-			}else{
-				if(!sender.isOp()){
-					sender.sendMessage(ChatColor.RED + "You don't have permission to do that!");
-					return true;
-				}else{
-					return onPlayerBan(sender, args);
 				}
 			}
-		}
-		if(label.equalsIgnoreCase("nbunban")){
-			if(permissions != null){
-				if(sender instanceof Player){
-					if(!(this.permissionHandler.has((Player) sender, "netherban.nbunban"))){
+			if(label.equalsIgnoreCase("nbunban")){
+				if(permissions != null){
+					if(sender instanceof Player){
+						if(!(this.permissionHandler.has((Player) sender, "netherban.nbunban"))){
+							sender.sendMessage(ChatColor.RED + "You don't have permission to do that!");
+							return true;
+						}else{
+							return onPlayerUnbanned(sender, args);
+						}
+					}else{
+						return onPlayerUnbanned(sender, args);
+					}
+				}else{
+					if(!sender.isOp()){
 						sender.sendMessage(ChatColor.RED + "You don't have permission to do that!");
 						return true;
 					}else{
 						return onPlayerUnbanned(sender, args);
 					}
-				}else{
-					return onPlayerUnbanned(sender, args);
-				}
-			}else{
-				if(!sender.isOp()){
-					sender.sendMessage(ChatColor.RED + "You don't have permission to do that!");
-					return true;
-				}else{
-					return onPlayerUnbanned(sender, args);
 				}
 			}
-		}
-		if(label.equalsIgnoreCase("nbkick")){
-			if(permissions != null){
-				if(sender instanceof Player){
-					if(!(this.permissionHandler.has((Player)sender, "netherban.nbkick"))){
+			if(label.equalsIgnoreCase("nbkick")){
+				if(permissions != null){
+					if(sender instanceof Player){
+						if(!(this.permissionHandler.has((Player)sender, "netherban.nbkick"))){
+							sender.sendMessage(ChatColor.RED + "You don't have permission to do that!");
+							return true;
+						}else{
+							return onPlayerKick(sender, args);
+						}
+					}else{
+						return onPlayerKick(sender, args);
+					}
+				}else{
+					if(!sender.isOp()){
 						sender.sendMessage(ChatColor.RED + "You don't have permission to do that!");
 						return true;
 					}else{
 						return onPlayerKick(sender, args);
 					}
-				}else{
-					return onPlayerKick(sender, args);
-				}
-			}else{
-				if(!sender.isOp()){
-					sender.sendMessage(ChatColor.RED + "You don't have permission to do that!");
-					return true;
-				}else{
-					return onPlayerKick(sender, args);
 				}
 			}
-		}
-		if(label.equalsIgnoreCase("nbwl") || label.equalsIgnoreCase("nbwhitelist")){
-			if(permissions != null){
-				if(sender instanceof Player){
-					if(!(this.permissionHandler.has((Player)sender, "netherban.whitelist"))){
+			if(label.equalsIgnoreCase("nbwl") || label.equalsIgnoreCase("nbwhitelist")){
+				if(permissions != null){
+					if(sender instanceof Player){
+						if(!(this.permissionHandler.has((Player)sender, "netherban.whitelist"))){
+							sender.sendMessage(ChatColor.RED + "You don't have permission to do that!");
+							return true;
+						}else{
+							return onWhitelist(sender, args);
+						}
+					}else{
+						return onWhitelist(sender, args);
+					}
+				}else{
+					if(!sender.isOp()){
 						sender.sendMessage(ChatColor.RED + "You don't have permission to do that!");
 						return true;
 					}else{
 						return onWhitelist(sender, args);
 					}
-				}else{
-					return onWhitelist(sender, args);
-				}
-			}else{
-				if(!sender.isOp()){
-					sender.sendMessage(ChatColor.RED + "You don't have permission to do that!");
-					return true;
-				}else{
-					return onWhitelist(sender, args);
 				}
 			}
+		}else{
+			sender.sendMessage(prefix + ChatColor.RED + " Error: Your NetherBan.prop is not configured properly!");
+			return true;
 		}
 		return false;
 	}
