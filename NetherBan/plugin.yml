@@ -1,6 +1,6 @@
 name: NetherBan
 main: com.aim.wjcrouse913.NetherBan.NetherBan
-version: 0.4
+version: 0.5
 description: NetherBan allows you to ban and kick players to the Nether!
 author: Walker Crouse
 database: false

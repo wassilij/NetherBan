@@ -35,10 +35,13 @@ import org.bukkit.plugin.Plugin;
 
 public class NetherBan extends JavaPlugin {
 	public static String prefix = "[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "]";
-	public static String version = "v0.4";
+	public static String version = "v0.5";
 	public static String whitelist;
 	public static String nethername;
 	public static String normalname;
+	public static boolean kickDeath;
+	public static boolean death;
+	public static boolean target;
 	public static boolean commands;
 	public static boolean pvp;
 	public static boolean emptybucket;
@@ -74,6 +77,9 @@ public class NetherBan extends JavaPlugin {
 		}catch (IOException e) {
 			e.printStackTrace();
 		}
+		kickDeath = Boolean.parseBoolean(prop.getProperty("Kick-on-Death"));
+		death = Boolean.parseBoolean(prop.getProperty("Banish-on-Death"));
+		target = Boolean.parseBoolean(prop.getProperty("Entities-Target-Banished"));
 		lightning = Boolean.parseBoolean(prop.getProperty("Display-Lightning-On-Banish"));
 		commands = Boolean.parseBoolean(prop.getProperty("Banished-Cant-Use-Commands"));
 		nethername = prop.getProperty("Nether-World-Name");
@@ -113,6 +119,9 @@ public class NetherBan extends JavaPlugin {
 			try{
 				ConfigCreate.createNewFile();
 	            FileOutputStream out = new FileOutputStream(ConfigCreate);
+	            prop.put("Kick-on-Death", "false");
+	            prop.put("Banish-on-Death", "false");
+	            prop.put("Entities-Target-Banished", "false");
 	            prop.put("Display-Lightning-On-Banish", "true");
 	            prop.put("Banished-Cant-Use-Commands", "true");
 	            prop.put("Nether-World-Name", "world_nether");
@@ -135,7 +144,8 @@ public class NetherBan extends JavaPlugin {
 			loadProcedure();
 		}
 		PluginManager pm = this.getServer().getPluginManager();
-		pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener, Event.Priority.Normal, this);
+		pm.registerEvent(Event.Type.ENTITY_TARGET, entityListener, Event.Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener, Event.Priority.Highest, this);
 		pm.registerEvent(Event.Type.PLAYER_PORTAL, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Event.Priority.Normal, this);
@@ -145,7 +155,7 @@ public class NetherBan extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_CHAT, playerListener, Event.Priority.Normal, this);
-		pm.registerEvent(Event.Type.PLAYER_RESPAWN, playerListener, Event.Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_RESPAWN, playerListener, Event.Priority.Highest, this);
 		log.info("[NetherBan] NetherBan Enabled. Torturing souls...");
 	}
 	public void onDisable(){
@@ -347,6 +357,21 @@ public class NetherBan extends JavaPlugin {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
+				}else{
+					try {
+						main(null);
+						Writer output = null;
+						String text = p;
+						File file = new File("plugins/NetherBan/banished.txt");
+						output = new BufferedWriter(new FileWriter(file));
+						output.write(text);
+						output.close();
+						System.out.println("[NetherBan] " + p + " was banished to the Nether!");
+						sender.sendMessage(prefix + " " + ChatColor.GREEN + p + ChatColor.GRAY + " has been banished to the Nether!");
+						return true;
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
 			}else{
 				sender.sendMessage(prefix + " " + ChatColor.GREEN + banned.getDisplayName() + ChatColor.GRAY + " cannot be banished to the Nether!" );
@@ -381,20 +406,40 @@ public class NetherBan extends JavaPlugin {
 								output = new BufferedWriter(new FileWriter(file));
 								output.write(text);
 								output.close();
-
+								playerBanish.remove(unbanned);
+								unbanned.teleport(this.getServer().getWorld(normalname).getSpawnLocation());
+								sender.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "] " + ChatColor.GREEN + unbanned.getDisplayName() + ChatColor.GRAY + " unbanished from the Nether!");
+								unbanned.sendMessage(prefix + ChatColor.GRAY + " You have been freed from the Nether!");
+								return true;
 							}
-
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
-
 					}
-					playerBanish.remove(unbanned);
-					unbanned.teleport(this.getServer().getWorld(normalname).getSpawnLocation());
-					sender.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "] " + ChatColor.GREEN + unbanned.getDisplayName() + ChatColor.GRAY + " unbanished from the Nether!");
-					unbanned.sendMessage(prefix + ChatColor.GRAY + " You have been freed from the Nether!");
-					return true;
-
+				}else{
+					try {
+						BufferedReader in = new BufferedReader(new FileReader("plugins/NetherBan/banished.txt"));
+						String str;
+						while ((str = in.readLine()) != null) {
+							String name = p;
+							if(str.equals(name)){
+								main(null);
+								Writer output = null;
+								String text = " ";
+								File file = new File("plugins/NetherBan/banished.txt");
+								output = new BufferedWriter(new FileWriter(file));
+								output.write(text);
+								output.close();
+								sender.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "] " + ChatColor.GREEN + p + ChatColor.GRAY + " is offline but was unbanished from the Nether! Reload server for it to take effect!");
+								return true;
+							}else{
+								sender.sendMessage(prefix + " " + ChatColor.GREEN + p + ChatColor.GRAY + " is not banished!");
+								return true;
+							}
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 			return false;

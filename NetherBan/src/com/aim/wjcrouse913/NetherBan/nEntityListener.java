@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityListener;
+import org.bukkit.event.entity.EntityTargetEvent;
 
 public class nEntityListener extends EntityListener{
 	public static NetherBan plugin;
@@ -12,6 +13,16 @@ public class nEntityListener extends EntityListener{
 	public nEntityListener(NetherBan instance){
 		plugin = instance;
 
+	}
+	public void onEntityTarget(EntityTargetEvent event){
+		if(event.getTarget() instanceof Player){
+			Player player = (Player)event.getTarget();
+			if(plugin.playerBanish.containsKey(player)){
+				if(NetherBan.target == false){
+					event.setCancelled(true);
+				}
+			}
+		}
 	}
 	public void onEntityDamage(EntityDamageEvent event){
 		if(NetherBan.pvp == true){

@@ -22,15 +22,15 @@ public class nPlayerListener extends PlayerListener {
 
 	public nPlayerListener(NetherBan instance) {
 		plugin = instance;
-
+		
 	}
+	@Override
 	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event){
 		if(NetherBan.commands == true){
 			Player player = event.getPlayer();
 			if(plugin.playerBanish.containsKey(player)){
 				player.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "]" + ChatColor.GRAY + " You cannot use commands while banned!");
 				event.setCancelled(true);
-
 			}
 		}
 	}
@@ -43,7 +43,8 @@ public class nPlayerListener extends PlayerListener {
 		    	String name = player.getName();
 		    	if(str.equals(name)){
 		    		plugin.playerBanish.put(player, false);
-		    		player.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "]" + ChatColor.GRAY + " You are still banished to the Nether!");
+		    		player.teleport(plugin.getServer().getWorld(NetherBan.nethername).getSpawnLocation());
+			    	player.sendMessage("[" + ChatColor.DARK_RED + "NetherBan" + ChatColor.WHITE + "]" + ChatColor.GRAY + " You are still banished to the Nether!");
 		    	}
 		    }
 		    in.close();
@@ -92,11 +93,24 @@ public class nPlayerListener extends PlayerListener {
 			event.setCancelled(true);
 		}
 	}
+	@Override
 	public void onPlayerRespawn(PlayerRespawnEvent event){
 		Player player = event.getPlayer();
 		if(plugin.playerBanish.containsKey(player)){
 			Location loc = plugin.getServer().getWorld(NetherBan.nethername).getSpawnLocation();
 			event.setRespawnLocation(loc);
+		}
+		if(NetherBan.death == true){
+			plugin.playerBanish.put(player, false);
+			Location loc = plugin.getServer().getWorld(NetherBan.nethername).getSpawnLocation();
+			event.setRespawnLocation(loc);
+			player.sendMessage(NetherBan.prefix + ChatColor.GRAY + " You have been banished to the Nether for dying!");
+		}
+		if(NetherBan.kickDeath == true){
+			Location loc = plugin.getServer().getWorld(NetherBan.nethername).getSpawnLocation();
+			event.setRespawnLocation(loc);
+			player.sendMessage(NetherBan.prefix + ChatColor.GRAY + " You have been kicked to the Nether for dying!");
+		
 		}
 	}
 	public static void main(String[] args)throws IOException{
