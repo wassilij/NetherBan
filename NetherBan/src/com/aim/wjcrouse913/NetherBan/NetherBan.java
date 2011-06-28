@@ -140,6 +140,7 @@ public class NetherBan extends JavaPlugin {
 			}catch (IOException ex) {
 				ex.printStackTrace();
 			}
+                        loadProcedure();
 		}else{
 			loadProcedure();
 		}
